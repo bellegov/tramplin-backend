@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/tramplin # <-- ИЗМЕНИЛИ 5432 НА 5433
+    username: root
+    password: root
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080
+
+minio:
+  url: http://localhost:9000 # Адрес для фронта и выдачи URL
+  internal-url: http://minio:9000 # Адрес для Докера (внутренняя сеть)
+  access-key: root
+  secret-key: rootpassword
+  bucket-name: tramplin-images
+
+
+initial-admin:
+  email: admin@tramplin.ru
+  password: 12345678
+  display-name: Главный Администратор
