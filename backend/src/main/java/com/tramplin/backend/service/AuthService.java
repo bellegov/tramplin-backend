@@ -16,6 +16,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -49,7 +52,7 @@ public class AuthService {
                 .build();
         employerRepo.save(profile);
 
-        return new AuthResponse(jwtService.generateToken(user));
+        return createAuthResponse(user);
     }
 
     public AuthResponse registerSeeker(SeekerRegisterRequest request) {
@@ -72,7 +75,7 @@ public class AuthService {
                 .build();
         seekerRepo.save(profile);
 
-        return new AuthResponse(jwtService.generateToken(user));
+        return createAuthResponse(user);
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -81,7 +84,18 @@ public class AuthService {
         );
         var user = userRepository.findByEmail(request.email()).orElseThrow();
         var jwtToken = jwtService.generateToken(user);
-        return new AuthResponse(jwtToken);
+        return createAuthResponse(user);
+    }
+    private AuthResponse createAuthResponse(User user) {
+        Map<String, Object> extraClaims = new HashMap<>();
+        // ПРАВИЛЬНО: используем put() для Map
+        extraClaims.put("role", user.getRole().name());
+
+        // Генерируем токен, внутри которого теперь зашита роль
+        String jwtToken = jwtService.generateToken(extraClaims, user);
+
+        // Возвращаем DTO с токеном и ролью в чистом виде для фронта
+        return new AuthResponse(jwtToken, user.getRole().name());
     }
 
 
