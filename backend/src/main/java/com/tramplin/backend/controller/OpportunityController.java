@@ -54,13 +54,14 @@ public class OpportunityController {
 
     @GetMapping
     public ResponseEntity<List<OpportunityResponse>> getAll(
+            @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) WorkFormat format,
             @RequestParam(required = false) String tag,
             @RequestParam(required = false) Integer minSalary) {
 
         // Если параметров нет, метод в репозитории отработает корректно (выдаст всё)
-        return ResponseEntity.ok(opportunityService.searchOpportunities(city, format, tag, minSalary));
+        return ResponseEntity.ok(opportunityService.searchOpportunities(keyword,city, format, tag, minSalary));
     }
 
     // Получить детальную инфу (ДЛЯ МОДАЛКИ)

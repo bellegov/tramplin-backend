@@ -13,6 +13,23 @@ public interface OpportunityRepository extends JpaRepository<Opportunity, Long> 
     // Оставляем этот метод для получения всех по статусу (без фильтров)
     List<Opportunity> findAllByStatus(OpportunityStatus status);
     List<Opportunity> findAllByEmployerId(Long employerId);
+    // В OpportunityRepository.java
+
+    @Query("SELECT DISTINCT o FROM Opportunity o LEFT JOIN o.tags t WHERE " +
+            "o.status = 'OPEN' AND " +
+            "(:keyword IS NULL OR LOWER(o.title) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(o.description) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
+            "(:city IS NULL OR o.city = :city) AND " +
+            "(:format IS NULL OR o.workFormat = :format) AND " +
+            "(:tag IS NULL OR t.name = :tag) AND " +
+            "(:minSalary IS NULL OR o.salary >= :minSalary)")
+    List<Opportunity> findByFilters(
+            @Param("keyword") String keyword, // ДОБАВИЛИ
+            @Param("city") String city,
+            @Param("format") WorkFormat format,
+            @Param("tag") String tag,
+            @Param("minSalary") Integer minSalary
+    );
 
     // НАШ КРУТОЙ ПОИСК (Тут мы жестко прописали статус 'OPEN')
     @Query("SELECT DISTINCT o FROM Opportunity o LEFT JOIN o.tags t WHERE " +

@@ -92,7 +92,7 @@ public class OpportunityService {
     }
 
     // ОСНОВНОЙ МЕТОД: Поиск и получение списка (с пометкой Избранного!)
-    public List<OpportunityResponse> searchOpportunities(String city, WorkFormat format, String tag, Integer minSalary) {
+    public List<OpportunityResponse> searchOpportunities( String keyword, String city, WorkFormat format, String tag, Integer minSalary) {
         Set<Long> favoriteIds = getFavoriteIdsForUser();
 
         return opportunityRepository.findByFilters(city, format, tag, minSalary)
