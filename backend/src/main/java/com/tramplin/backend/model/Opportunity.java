@@ -3,6 +3,8 @@ package com.tramplin.backend.model;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "opportunities")
@@ -45,13 +47,14 @@ public class Opportunity {
     @Enumerated(EnumType.STRING)
     private OpportunityStatus status = OpportunityStatus.OPEN;
 
+    @Builder.Default // Чтобы Lombok Builder не затирал инициализацию
     @ManyToMany
     @JoinTable(
             name = "opportunity_tags",
             joinColumns = @JoinColumn(name = "opportunity_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
-    private java.util.Set<Tag> tags = new java.util.HashSet<>();
+    private Set<Tag> tags = new HashSet<>();
 
     @Column(name = "image_url")
     private String imageUrl;

@@ -110,7 +110,9 @@ public class OpportunityService {
                 opp.getWorkFormat(), opp.getEmployer().getCompanyName(), opp.getCity(),
                 opp.getExactAddress(), opp.getLatitude(), opp.getLongitude(),
                 opp.getPublishedAt(), opp.getDeadline(), opp.getStatus(),isFavorite, opp.getSalary(),
-                opp.getTags().stream().map(Tag::getName).toList(),
+                opp.getTags() != null
+                        ? opp.getTags().stream().map(Tag::getName).collect(Collectors.toList())
+                        : java.util.Collections.emptyList(),
                 opp.getImageUrl() // Обложка вакансии
         );
     }
