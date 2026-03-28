@@ -44,6 +44,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/opportunities/**").permitAll()
                         //    Это включает просмотр публичного профиля компании
                         .requestMatchers(HttpMethod.GET, "/api/v1/employers/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/tags").permitAll()
 
                         // 4. Полный доступ к админ-панели только для роли ADMIN
                         .requestMatchers("/api/v1/admin/**").hasAuthority("ROLE_ADMIN")

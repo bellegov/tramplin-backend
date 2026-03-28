@@ -29,6 +29,7 @@ public class OpportunityService {
     private final FavoriteRepository favoriteRepository;
     private final SubscriptionRepository subscriptionRepository;
     private final NotificationRepository notificationRepository;
+    private final TagRepository tagRepository;
 
     private User getCurrentUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -47,6 +48,23 @@ public class OpportunityService {
             throw new RuntimeException("Ваш аккаунт еще не прошел верификацию куратором!");
         }
 
+        // --- МАГИЯ ТЕГОВ НАЧИНАЕТСЯ ЗДЕСЬ ---
+        Set<Tag> opportunityTags = new HashSet<>();
+        if (request.tags() != null && !request.tags().isEmpty()) {
+            for (String tagName : request.tags()) {
+                // Ищем тег (игнорируя регистр, чтобы Java и java были одним тегом)
+                Tag tag = tagRepository.findByNameIgnoreCase(tagName.trim())
+                        .orElseGet(() -> {
+                            // Если не нашли - создаем новый на лету!
+                            Tag newTag = new Tag();
+                            newTag.setName(tagName.trim().toLowerCase());
+                            return tagRepository.save(newTag);
+                        });
+                opportunityTags.add(tag);
+            }
+        }
+
+
         Opportunity opportunity = Opportunity.builder()
                 .employer(employer)
                 .title(request.title())
@@ -61,6 +79,7 @@ public class OpportunityService {
                 .deadline(request.deadline())
                 .salary(request.salary()) // Устанавливаем зп
                 .status(OpportunityStatus.OPEN) // Всегда OPEN при создании
+                .tags(opportunityTags)
                 .build();
 
         Opportunity saved = opportunityRepository.save(opportunity);
@@ -192,6 +211,21 @@ public class OpportunityService {
             throw new RuntimeException("Нет прав на редактирование");
         }
 
+        Set<Tag> opportunityTags = new HashSet<>();
+        if (request.tags() != null && !request.tags().isEmpty()) {
+            for (String tagName : request.tags()) {
+                // Ищем тег (игнорируя регистр, чтобы Java и java были одним тегом)
+                Tag tag = tagRepository.findByNameIgnoreCase(tagName.trim())
+                        .orElseGet(() -> {
+                            // Если не нашли - создаем новый на лету!
+                            Tag newTag = new Tag();
+                            newTag.setName(tagName.trim().toLowerCase());
+                            return tagRepository.save(newTag);
+                        });
+                opportunityTags.add(tag);
+            }
+        }
+
         // Обновляем поля
         opp.setTitle(request.title());
         opp.setDescription(request.description());
@@ -203,6 +237,7 @@ public class OpportunityService {
         opp.setLongitude(request.longitude());
         opp.setDeadline(request.deadline());
         opp.setSalary(request.salary());
+        opp.setTags(opportunityTags);
         // Если нужно менять статус (например из ARCHIVED обратно в OPEN) - можно добавить поле в Request
 
         Opportunity saved = opportunityRepository.save(opp);

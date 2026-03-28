@@ -12,7 +12,7 @@ public class Friendship {
     private Long id;
 
     @ManyToOne @JoinColumn(name = "seeker_id")
-    private SeekerProfile seeker;
+    public SeekerProfile seeker;
 
     @ManyToOne @JoinColumn(name = "friend_id")
     private SeekerProfile friend;
