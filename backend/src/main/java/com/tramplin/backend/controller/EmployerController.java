@@ -13,6 +13,7 @@ import com.tramplin.backend.service.EmployerService;
 import com.tramplin.backend.service.MinioService;
 import com.tramplin.backend.service.OpportunityService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -94,41 +95,55 @@ public class EmployerController {
         ));
     }
 
-    // РЕАЛЬНАЯ ПОДПИСКА НА КОМПАНИЮ
     @PostMapping("/{employerId}/subscribe")
-    public ResponseEntity<String> subscribe(@PathVariable Long employerId) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByEmail(email).orElseThrow();
+    public ResponseEntity<?> subscribe(@PathVariable Long employerId) {
+        try {
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        SeekerProfile seeker = seekerProfileRepository.findById(user.getId())
-                .orElseThrow(() -> new RuntimeException("Только соискатели могут подписываться"));
+            if (user.getRole() != Role.ROLE_SEEKER) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("Ошибка: Только соискатели (студенты) могут подписываться на компании!");
+            }
 
-        EmployerProfile employer = employerProfileRepository.findById(employerId)
-                .orElseThrow(() -> new RuntimeException("Компания не найдена"));
+            SeekerProfile seeker = seekerProfileRepository.findById(user.getId())
+                    .orElseThrow(() -> new RuntimeException("Профиль соискателя не найден"));
 
-        // Проверяем, не подписан ли уже
-        if (subscriptionRepository.existsBySeekerIdAndEmployerId(seeker.getId(), employer.getId())) {
-            return ResponseEntity.badRequest().body("Вы уже подписаны на эту компанию");
+            EmployerProfile employer = employerProfileRepository.findById(employerId)
+                    .orElseThrow(() -> new RuntimeException("Компания с ID " + employerId + " не найдена"));
+
+            if (subscriptionRepository.existsBySeekerIdAndEmployerId(seeker.getId(), employer.getId())) {
+                return ResponseEntity.badRequest().body("Вы уже подписаны на эту компанию");
+            }
+
+            subscriptionRepository.save(Subscription.builder()
+                    .seeker(seeker)
+                    .employer(employer)
+                    .build());
+
+            return ResponseEntity.ok("Вы успешно подписались на уведомления от " + employer.getCompanyName());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Ошибка бэкенда: " + e.getMessage());
         }
-
-        subscriptionRepository.save(Subscription.builder()
-                .seeker(seeker)
-                .employer(employer)
-                .build());
-
-        return ResponseEntity.ok("Вы успешно подписались на уведомления от " + employer.getCompanyName());
     }
 
-    // ОТПИСКА ОТ КОМПАНИИ
     @DeleteMapping("/{employerId}/unsubscribe")
-    public ResponseEntity<String> unsubscribe(@PathVariable Long employerId) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByEmail(email).orElseThrow();
+    public ResponseEntity<?> unsubscribe(@PathVariable Long employerId) {
+        try {
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            User user = userRepository.findByEmail(email).orElseThrow();
 
-        var subscription = subscriptionRepository.findBySeekerIdAndEmployerId(user.getId(), employerId)
-                .orElseThrow(() -> new RuntimeException("Вы не подписаны на эту компанию"));
+            Subscription subscription = subscriptionRepository.findBySeekerIdAndEmployerId(user.getId(), employerId)
+                    .orElseThrow(() -> new RuntimeException("Вы не подписаны на эту компанию"));
 
-        subscriptionRepository.delete(subscription);
-        return ResponseEntity.ok("Вы отписались от уведомлений");
+            subscriptionRepository.delete(subscription);
+            return ResponseEntity.ok("Вы отписались от уведомлений");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Ошибка: " + e.getMessage());
+        }
     }
 }
+
