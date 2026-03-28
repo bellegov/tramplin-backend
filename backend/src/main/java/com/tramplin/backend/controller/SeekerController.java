@@ -31,6 +31,19 @@ public class SeekerController {
     public ResponseEntity<SeekerProfileResponse> updateProfile(@RequestBody SeekerProfileUpdateRequest request) {
         return ResponseEntity.ok(seekerService.updateProfile(request));
     }
+    // В SeekerController.java добавь этот метод:
+
+    @GetMapping("/profile")
+    public ResponseEntity<SeekerProfileResponse> getMyProfile() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        SeekerProfile profile = seekerProfileRepository.findById(user.getId())
+                .orElseThrow(() -> new RuntimeException("Профиль не найден"));
+
+        return ResponseEntity.ok(seekerService.mapToResponse(profile));
+    }
 
     @PostMapping("/applications/{opportunityId}")
     public ResponseEntity<ApplicationResponse> apply(

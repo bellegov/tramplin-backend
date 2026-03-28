@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/employers/profile")
+@RequestMapping("/api/v1/employers") // ИСПРАВЛЕН БАЗОВЫЙ ПУТЬ
 @RequiredArgsConstructor
 public class EmployerController {
 
@@ -30,12 +30,14 @@ public class EmployerController {
     private final UserRepository userRepository;
     private final OpportunityService opportunityService;
 
-    @GetMapping
+    // --- ЛИЧНЫЙ ПРОФИЛЬ ---
+
+    @GetMapping("/profile")
     public ResponseEntity<EmployerProfileResponse> getMyProfile() {
         return ResponseEntity.ok(employerService.getMyProfile());
     }
 
-    @PutMapping
+    @PutMapping("/profile")
     public ResponseEntity<EmployerProfileResponse> updateProfile(@RequestBody EmployerProfileUpdateRequest request) {
         return ResponseEntity.ok(employerService.updateProfile(request));
     }
@@ -45,33 +47,6 @@ public class EmployerController {
         String fileUrl = minioService.uploadFile(file);
         return ResponseEntity.ok(employerService.updateLogo(fileUrl));
     }
-    @GetMapping("/applications")
-    public ResponseEntity<List<ApplicationResponse>> getApplications() {
-        return ResponseEntity.ok(employerService.getApplicationsForMyOpportunities());
-    }
-
-    @PatchMapping("/applications/{applicationId}/status")
-    public ResponseEntity<com.tramplin.backend.dto.ApplicationResponse> changeStatus(
-            @PathVariable Long applicationId,
-            @RequestParam ApplicationStatus status) {
-        return ResponseEntity.ok(employerService.changeApplicationStatus(applicationId, status));
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<EmployerProfileResponse> getEmployerPublicProfile(@PathVariable Long id) {
-        EmployerProfile profile = employerProfileRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Компания не найдена"));
-
-        // Отдаем DTO (пароли и лишнее не светятся)
-        return ResponseEntity.ok(new EmployerProfileResponse(
-                profile.getId(), profile.getCompanyName(), null, // ИНН можно скрыть в публичке
-                profile.getDescription(), profile.getIndustry(), profile.getWebsite(), profile.getVerificationStatus(),profile.getLogoUrl()));
-    }
-    @PostMapping("/{employerId}/subscribe")
-    public ResponseEntity<String> subscribe(@PathVariable Long employerId) {
-        // Логика: находим текущего соискателя и сохраняем связь в SubscriptionRepository
-        return ResponseEntity.ok("Вы подписались на уведомления компании");
-    }
 
     @DeleteMapping("/profile/logo")
     public ResponseEntity<String> deleteLogo() {
@@ -79,10 +54,23 @@ public class EmployerController {
         User user = userRepository.findByEmail(email).orElseThrow();
         EmployerProfile profile = employerProfileRepository.findById(user.getId()).orElseThrow();
 
-        profile.setLogoUrl(null); // Стираем ссылку
+        profile.setLogoUrl(null);
         employerProfileRepository.save(profile);
-
         return ResponseEntity.ok("Логотип удален");
+    }
+
+    // --- ОТКЛИКИ И ВАКАНСИИ ---
+
+    @GetMapping("/profile/applications")
+    public ResponseEntity<List<ApplicationResponse>> getApplications() {
+        return ResponseEntity.ok(employerService.getApplicationsForMyOpportunities());
+    }
+
+    @PatchMapping("/profile/applications/{applicationId}/status")
+    public ResponseEntity<com.tramplin.backend.dto.ApplicationResponse> changeStatus(
+            @PathVariable Long applicationId,
+            @RequestParam ApplicationStatus status) {
+        return ResponseEntity.ok(employerService.changeApplicationStatus(applicationId, status));
     }
 
     @GetMapping("/my-opportunities")
@@ -90,4 +78,22 @@ public class EmployerController {
         return ResponseEntity.ok(opportunityService.getMyOpportunities());
     }
 
+    // --- ПУБЛИЧНЫЕ РУЧКИ ---
+
+    @GetMapping("/{id}")
+    public ResponseEntity<EmployerProfileResponse> getEmployerPublicProfile(@PathVariable Long id) {
+        EmployerProfile profile = employerProfileRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Компания не найдена"));
+
+        return ResponseEntity.ok(new EmployerProfileResponse(
+                profile.getId(), profile.getCompanyName(), null,
+                profile.getDescription(), profile.getIndustry(), profile.getWebsite(),
+                profile.getVerificationStatus(), profile.getLogoUrl()
+        ));
+    }
+
+    @PostMapping("/{employerId}/subscribe")
+    public ResponseEntity<String> subscribe(@PathVariable Long employerId) {
+        return ResponseEntity.ok("Вы подписались на уведомления компании");
+    }
 }
