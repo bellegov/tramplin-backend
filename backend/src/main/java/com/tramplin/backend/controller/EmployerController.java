@@ -30,8 +30,8 @@ public class EmployerController {
     private final MinioService minioService;
     private final UserRepository userRepository;
     private final OpportunityService opportunityService;
-    SeekerProfileRepository seekerProfileRepository;
-    SubscriptionRepository subscriptionRepository;
+    private final  SeekerProfileRepository seekerProfileRepository;
+    private final SubscriptionRepository subscriptionRepository;
 
     // --- ЛИЧНЫЙ ПРОФИЛЬ ---
 
