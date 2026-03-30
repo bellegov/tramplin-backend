@@ -155,6 +155,17 @@ public class OpportunityService {
         );
     }
 
+    public List<OpportunityResponse> getMyFavorites() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow();
+
+        // Вытаскиваем все избранные связи пользователя
+        return favoriteRepository.findAllByUserId(user.getId())
+                .stream()
+                .map(favorite -> mapToResponse(favorite.getOpportunity(), true)) // isFavorite тут всегда true
+                .collect(Collectors.toList());
+    }
+
 
     @Transactional
     public OpportunityResponse changeOpportunityStatus(Long id, OpportunityStatus newStatus) {
