@@ -4,6 +4,7 @@ import com.tramplin.backend.dto.OpportunityCreateRequest;
 import com.tramplin.backend.dto.OpportunityDetailedResponse;
 import com.tramplin.backend.dto.OpportunityResponse;
 import com.tramplin.backend.model.Opportunity;
+import com.tramplin.backend.model.OpportunityStatus;
 import com.tramplin.backend.model.User;
 import com.tramplin.backend.model.WorkFormat;
 import com.tramplin.backend.repository.OpportunityRepository;
@@ -83,6 +84,14 @@ public class OpportunityController {
             @PathVariable Long id,
             @RequestBody OpportunityCreateRequest request) {
         return ResponseEntity.ok(opportunityService.updateOpportunity(id, request));
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<com.tramplin.backend.dto.OpportunityResponse> changeStatus(
+            @PathVariable Long id,
+            @RequestParam OpportunityStatus status) {
+
+        return ResponseEntity.ok(opportunityService.changeOpportunityStatus(id, status));
     }
 
 }

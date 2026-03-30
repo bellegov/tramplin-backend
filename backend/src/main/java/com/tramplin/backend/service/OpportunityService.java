@@ -155,6 +155,25 @@ public class OpportunityService {
         );
     }
 
+
+    @Transactional
+    public OpportunityResponse changeOpportunityStatus(Long id, OpportunityStatus newStatus) {
+        User user = getCurrentUser();
+        Opportunity opp = opportunityRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Вакансия не найдена"));
+
+        // Проверяем, что это владелец вакансии (или админ)
+        if (!opp.getEmployer().getId().equals(user.getId()) && user.getRole() != Role.ROLE_ADMIN) {
+            throw new RuntimeException("Нет прав на изменение статуса этой вакансии");
+        }
+
+        // Меняем статус
+        opp.setStatus(newStatus);
+        Opportunity saved = opportunityRepository.save(opp);
+
+        return mapToResponse(saved, getFavoriteIdsForUser().contains(id));
+    }
+
 // ----------------------------------------------------
 // НОВЫЕ МЕТОДЫ ДЛЯ ФОТО И ДЕТАЛЬНОЙ СТРАНИЦЫ
 // ----------------------------------------------------
