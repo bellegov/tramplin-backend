@@ -1,6 +1,9 @@
 package com.tramplin.backend.service;
 
-import com.tramplin.backend.dto.*;
+import com.tramplin.backend.dto.ApplicationResponse;
+import com.tramplin.backend.dto.SeekerProfileDetailedResponse;
+import com.tramplin.backend.dto.SeekerProfileResponse;
+import com.tramplin.backend.dto.SeekerProfileUpdateRequest;
 import com.tramplin.backend.model.*;
 import com.tramplin.backend.model.entity.Application;
 import com.tramplin.backend.repository.*;
@@ -128,17 +131,7 @@ public class SeekerService {
 
     public ApplicationResponse mapApplicationResponse(Application app) {
 
-        List<Recommendation> recommendations = recommendationRepository
-                .findAllByRecommendedIdAndOpportunityId(app.getSeeker().getId(), app.getOpportunity().getId());
-
-        // 2. Превращаем их в DTO
-        List<RecommenderInfo> recommenderInfos = recommendations.stream()
-                .map(rec -> new RecommenderInfo(
-                        rec.getRecommender().getId(),
-                        rec.getRecommender().getUser().getDisplayName(),
-                        rec.getMessage()
-                ))
-                .collect(java.util.stream.Collectors.toList());
+        
         return new ApplicationResponse(
                 app.getId(),
                 app.getOpportunity().getId(),
