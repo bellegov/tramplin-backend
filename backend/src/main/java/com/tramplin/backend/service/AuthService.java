@@ -34,7 +34,7 @@ public class AuthService {
             throw new RuntimeException("Email уже занят");
         }
 
-        // 1. Создаем юзера
+
         var user = User.builder()
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
@@ -43,12 +43,12 @@ public class AuthService {
                 .build();
         userRepository.save(user);
 
-        // 2. Сразу создаем профиль компании с данными из запроса
+
         var profile = EmployerProfile.builder()
                 .user(user)
                 .companyName(request.companyName())
                 .inn(request.inn())
-                .verificationStatus(VerificationStatus.PENDING) // Статус: Ожидание
+                .verificationStatus(VerificationStatus.PENDING)
                 .build();
         employerRepo.save(profile);
 
@@ -88,13 +88,13 @@ public class AuthService {
     }
     private AuthResponse createAuthResponse(User user) {
         Map<String, Object> extraClaims = new HashMap<>();
-        // ПРАВИЛЬНО: используем put() для Map
+
         extraClaims.put("role", user.getRole().name());
 
-        // Генерируем токен, внутри которого теперь зашита роль
+
         String jwtToken = jwtService.generateToken(extraClaims, user);
 
-        // Возвращаем DTO с токеном и ролью в чистом виде для фронта
+
         return new AuthResponse(jwtToken, user.getRole().name());
     }
 
@@ -104,17 +104,16 @@ public class AuthService {
             throw new RuntimeException("Email " + request.email() + " уже занят");
         }
 
-        // 1. Создаем пользователя
+
         var user = User.builder()
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
                 .displayName(request.displayName())
-                .role(Role.ROLE_ADMIN) // Роль жестко прописана как ADMIN!
+                .role(Role.ROLE_ADMIN)
                 .build();
         userRepository.save(user);
 
-        // 2. Важно: мы НЕ создаем для админа профиль соискателя или работодателя.
-        // Он просто пользователь с особыми правами.
+
     }
 
 }

@@ -18,14 +18,14 @@ public class EmployerService {
     private final EmployerProfileRepository employerProfileRepository;
     private final UserRepository userRepository;
     private final ApplicationRepository applicationRepository;
-    private final SeekerService seekerService; // Нужен для переиспользования маппера откликов
+    private final SeekerService seekerService;
 
     private User getCurrentUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByEmail(email).orElseThrow();
     }
 
-    // Работодатель заполняет свой профиль (вводит ИНН)
+
     public EmployerProfileResponse updateProfile(EmployerProfileUpdateRequest request) {
         User user = getCurrentUser();
         EmployerProfile profile = employerProfileRepository.findById(user.getId())
@@ -36,7 +36,7 @@ public class EmployerService {
         profile.setDescription(request.description());
         profile.setIndustry(request.industry());
         profile.setWebsite(request.website());
-        // Статус остается PENDING, пока куратор не проверит!
+
 
         EmployerProfile saved = employerProfileRepository.save(profile);
         return mapToResponse(saved);
@@ -71,7 +71,7 @@ public class EmployerService {
         com.tramplin.backend.model.entity.Application application = applicationRepository.findById(applicationId)
                 .orElseThrow(() -> new RuntimeException("Отклик не найден"));
 
-        // Проверяем, что эта вакансия реально принадлежит этому работодателю
+
         if (!application.getOpportunity().getEmployer().getId().equals(user.getId())) {
             throw new RuntimeException("Нет доступа к этому отклику");
         }

@@ -48,14 +48,14 @@ public class OpportunityService {
             throw new RuntimeException("Ваш аккаунт еще не прошел верификацию куратором!");
         }
 
-        // --- МАГИЯ ТЕГОВ НАЧИНАЕТСЯ ЗДЕСЬ ---
+
         Set<Tag> opportunityTags = new HashSet<>();
         if (request.tags() != null && !request.tags().isEmpty()) {
             for (String tagName : request.tags()) {
-                // Ищем тег (игнорируя регистр, чтобы Java и java были одним тегом)
+
                 Tag tag = tagRepository.findByNameIgnoreCase(tagName.trim())
                         .orElseGet(() -> {
-                            // Если не нашли - создаем новый на лету!
+
                             Tag newTag = new Tag();
                             newTag.setName(tagName.trim().toLowerCase());
                             return tagRepository.save(newTag);

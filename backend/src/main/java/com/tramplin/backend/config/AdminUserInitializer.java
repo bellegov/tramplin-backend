@@ -27,9 +27,8 @@ public class AdminUserInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Проверяем, существует ли уже хотя бы один админ в базе
         if (!userRepository.existsByRole(Role.ROLE_ADMIN)) {
-            // Если нет — создаем нашего первого админа
+
             User admin = User.builder()
                     .email(adminEmail)
                     .password(passwordEncoder.encode(adminPassword))

@@ -17,5 +17,5 @@ public class Friendship {
     @ManyToOne @JoinColumn(name = "friend_id")
     private SeekerProfile friend;
 
-    private boolean accepted = false; // Статус запроса в друзья
+    private boolean accepted = false;
 }

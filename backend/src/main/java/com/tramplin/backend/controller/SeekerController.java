@@ -31,7 +31,7 @@ public class SeekerController {
     public ResponseEntity<SeekerProfileResponse> updateProfile(@RequestBody SeekerProfileUpdateRequest request) {
         return ResponseEntity.ok(seekerService.updateProfile(request));
     }
-    // В SeekerController.java добавь этот метод:
+
 
     @GetMapping("/profile")
     public ResponseEntity<SeekerProfileResponse> getMyProfile() {
@@ -64,12 +64,11 @@ public class SeekerController {
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
         if (!profile.isPublic()) {
-            // Тут можно добавить логику: если не публичный, то проверять, является ли запрашивающий другом
             throw new RuntimeException("Этот профиль скрыт настройками приватности");
         }
 
         return ResponseEntity.ok(seekerService.mapToResponse(profile));
-        // (убедись, что метод mapToResponse в SeekerService сделан public)
+
     }
 
     @GetMapping("/{id}/detailed")
@@ -79,9 +78,8 @@ public class SeekerController {
 
     @PostMapping(value = "/profile/avatar", consumes = "multipart/form-data")
     public ResponseEntity<String> uploadAvatar(@RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
-        // Вызываем сервис в контроллере напрямую (для скорости)
         String fileUrl = minioService.uploadFile(file);
-        return ResponseEntity.ok(seekerService.updateAvatar(fileUrl)); // Метод updateAvatar мы сейчас напишем
+        return ResponseEntity.ok(seekerService.updateAvatar(fileUrl));
     }
     @DeleteMapping("/profile/avatar")
     public ResponseEntity<String> deleteAvatar() {
@@ -89,7 +87,7 @@ public class SeekerController {
         User user = userRepository.findByEmail(email).orElseThrow();
         SeekerProfile profile = seekerProfileRepository.findById(user.getId()).orElseThrow();
 
-        profile.setAvatarUrl(null); // Просто стираем ссылку
+        profile.setAvatarUrl(null);
         seekerProfileRepository.save(profile);
 
         return ResponseEntity.ok("Аватар удален");

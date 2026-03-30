@@ -13,7 +13,7 @@ public class Notification {
     private Long id;
 
     @ManyToOne @JoinColumn(name = "user_id")
-    private User user; // Кому пришло
+    private User user;
 
     private String message;
     private boolean isRead = false;

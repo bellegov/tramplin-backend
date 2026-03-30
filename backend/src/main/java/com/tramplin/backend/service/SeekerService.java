@@ -65,7 +65,7 @@ public class SeekerService {
         Opportunity opportunity = opportunityRepository.findById(opportunityId)
                 .orElseThrow(() -> new RuntimeException("Вакансия не найдена"));
 
-        // ГЛАВНАЯ ПРОВЕРКА:
+
         if (opportunity.getStatus() != OpportunityStatus.OPEN) {
             throw new RuntimeException("К сожалению, эта возможность уже закрыта или удалена.");
         }
@@ -74,7 +74,7 @@ public class SeekerService {
                 .seeker(seeker)
                 .opportunity(opportunity)
                 .coverLetter(coverLetter)
-                .status(ApplicationStatus.APPLIED) // Статус по умолчанию
+                .status(ApplicationStatus.APPLIED)
                 .appliedAt(LocalDateTime.now())
                 .build();
 
@@ -94,19 +94,19 @@ public class SeekerService {
         SeekerProfile target = seekerRepository.findById(targetSeekerId)
                 .orElseThrow(() -> new RuntimeException("Соискатель не найден"));
 
-        // Проверяем дружбу (в обе стороны)
+
         boolean isFriend = friendshipRepo.existsBySeekerIdAndFriendId(currentUser.getId(), targetSeekerId)
                 || friendshipRepo.existsBySeekerIdAndFriendId(targetSeekerId, currentUser.getId());
 
-        // Если не публичный, не друг и не админ - от ворот поворот
+
         if (!target.isPublic() && !isFriend && currentUser.getRole() != Role.ROLE_ADMIN) {
             throw new RuntimeException("Этот профиль скрыт настройками приватности");
         }
 
-        // Собираем базовую инфу
+
         SeekerProfileResponse baseInfo = mapToResponse(target);
 
-        // Собираем отклики (карьерные интересы)
+
         List<ApplicationResponse> apps = applicationRepository.findAllBySeekerId(targetSeekerId)
                 .stream()
                 .map(this::mapApplicationResponse)
@@ -131,7 +131,7 @@ public class SeekerService {
 
     public ApplicationResponse mapApplicationResponse(Application app) {
 
-        
+
         return new ApplicationResponse(
                 app.getId(),
                 app.getOpportunity().getId(),

@@ -47,7 +47,7 @@ public class OpportunityController {
             throw new RuntimeException("Нет прав на удаление обложки");
         }
 
-        opp.setImageUrl(null); // Стираем ссылку
+        opp.setImageUrl(null);
         opportunityRepository.save(opp);
 
         return ResponseEntity.ok("Обложка вакансии удалена");
@@ -61,11 +61,9 @@ public class OpportunityController {
             @RequestParam(required = false) String tag,
             @RequestParam(required = false) Integer minSalary) {
 
-        // Если параметров нет, метод в репозитории отработает корректно (выдаст всё)
         return ResponseEntity.ok(opportunityService.searchOpportunities(keyword,city, format, tag, minSalary));
     }
 
-    // Получить детальную инфу (ДЛЯ МОДАЛКИ)
     @GetMapping("/{id}")
     public ResponseEntity<OpportunityDetailedResponse> getDetailed(@PathVariable Long id) {
         return ResponseEntity.ok(opportunityService.getDetailedById(id));

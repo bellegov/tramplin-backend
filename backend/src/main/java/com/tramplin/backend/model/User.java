@@ -34,14 +34,14 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
-    // --- МЕТОДЫ SPRING SECURITY ---
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override
-    public String getUsername() { return email; } // В качестве логина юзаем email
+    public String getUsername() { return email; }
 
     @Override
     public boolean isAccountNonExpired() { return true; }

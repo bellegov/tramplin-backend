@@ -20,7 +20,6 @@ public class TagController {
 
     @GetMapping
     public ResponseEntity<List<String>> getAllTags() {
-        // Возвращаем просто массив строк ["java", "sql", "spring"]
         List<String> tags = tagRepository.findAll()
                 .stream()
                 .map(Tag::getName)

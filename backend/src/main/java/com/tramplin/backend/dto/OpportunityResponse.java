@@ -22,7 +22,7 @@ public record OpportunityResponse(
         LocalDateTime deadline,
         OpportunityStatus status,
         boolean isFavorite,
-        Integer salary,        // ДОБАВИЛИ
+        Integer salary,
         List<String> tags,
         String imageUrl
 ) {}

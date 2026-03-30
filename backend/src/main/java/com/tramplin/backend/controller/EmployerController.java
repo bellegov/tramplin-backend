@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/employers") // ИСПРАВЛЕН БАЗОВЫЙ ПУТЬ
+@RequestMapping("/api/v1/employers")
 @RequiredArgsConstructor
 public class EmployerController {
 

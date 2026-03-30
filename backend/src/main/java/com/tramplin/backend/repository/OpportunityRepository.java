@@ -24,14 +24,14 @@ public interface OpportunityRepository extends JpaRepository<Opportunity, Long> 
             "(:tag IS NULL OR t.name = :tag) AND " +
             "(:minSalary IS NULL OR o.salary >= :minSalary)")
     List<Opportunity> findByFilters(
-            @Param("keyword") String keyword, // ДОБАВИЛИ
+            @Param("keyword") String keyword,
             @Param("city") String city,
             @Param("format") WorkFormat format,
             @Param("tag") String tag,
             @Param("minSalary") Integer minSalary
     );
 
-    // НАШ КРУТОЙ ПОИСК (Тут мы жестко прописали статус 'OPEN')
+
     @Query("SELECT DISTINCT o FROM Opportunity o LEFT JOIN o.tags t WHERE " +
             "o.status = 'OPEN' AND " +
             "(:city IS NULL OR o.city = :city) AND " +

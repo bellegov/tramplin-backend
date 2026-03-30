@@ -77,17 +77,10 @@ public class AdminController {
     public ResponseEntity<Opportunity> updateOpportunityAdmin(@PathVariable Long id, @RequestBody Opportunity updated) {
         Opportunity existing = opportunityRepository.findById(id).orElseThrow();
 
-        // Обновляем поля
         existing.setTitle(updated.getTitle());
         existing.setDescription(updated.getDescription());
 
-        // ЗАМЕНИЛИ ЭТО:
-        // existing.setActive(updated.isActive());
-
-        // НА ЭТО:
         existing.setStatus(updated.getStatus());
-
-        // Также можем обновить зарплату и другие поля, если нужно
         existing.setSalary(updated.getSalary());
         existing.setCity(updated.getCity());
         existing.setWorkFormat(updated.getWorkFormat());
@@ -270,8 +263,6 @@ public class AdminController {
             throw new RuntimeException("Пользователь с ID " + id + " не найден");
         }
 
-        // Удаляем юзера (каскадом удалятся профили, если настроено в JPA,
-        // либо удаляем вручную профили перед этим)
         userRepository.deleteById(id);
 
         return ResponseEntity.ok("Пользователь с ID " + id + " и все его данные удалены из системы навсегда.");

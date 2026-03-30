@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/tramplin # <-- ИЗМЕНИЛИ 5432 НА 5433
+    url: jdbc:postgresql://localhost:5433/tramplin 
     username: root
     password: root
     driver-class-name: org.postgresql.Driver
@@ -16,8 +16,8 @@ server:
   port: 8080
 
 minio:
-  url: http://localhost:9000 # Адрес для фронта и выдачи URL
-  internal-url: http://minio:9000 # Адрес для Докера (внутренняя сеть)
+  url: http://localhost:9000
+  internal-url: http://minio:9000
   access-key: root
   secret-key: rootpassword
   bucket-name: tramplin-images

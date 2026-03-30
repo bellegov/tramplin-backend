@@ -24,7 +24,7 @@ public class FavoriteController {
     private final UserRepository userRepository;
     private final OpportunityService opportunityService;
 
-    // --- НОВАЯ РУЧКА ДЛЯ СПИСКА ИЗБРАННОГО ---
+    // ---  РУЧКА ДЛЯ СПИСКА ИЗБРАННОГО ---
     @GetMapping
     public ResponseEntity<List<OpportunityResponse>> getMyFavorites() {
         return ResponseEntity.ok(opportunityService.getMyFavorites());

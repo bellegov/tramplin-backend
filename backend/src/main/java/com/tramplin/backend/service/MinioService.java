@@ -49,7 +49,6 @@ public class MinioService {
                             .build()
             );
 
-            // Возвращаем прямую ссылку для тега <img src="...">
             return publicUrl + "/" + bucketName + "/" + fileName;
 
         } catch (Exception e) {

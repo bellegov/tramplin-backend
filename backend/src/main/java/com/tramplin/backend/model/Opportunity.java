@@ -36,18 +36,18 @@ public class Opportunity {
     private String city;
     private String exactAddress;
 
-    // Координаты для карты (Яндекс карты/Leaflet)
+
     private Double latitude;
     private Double longitude;
 
     private LocalDateTime publishedAt;
-    private LocalDateTime deadline; // Срок действия
+    private LocalDateTime deadline;
     private Integer salary;
 
     @Enumerated(EnumType.STRING)
     private OpportunityStatus status = OpportunityStatus.OPEN;
 
-    @Builder.Default // Чтобы Lombok Builder не затирал инициализацию
+    @Builder.Default
     @ManyToMany
     @JoinTable(
             name = "opportunity_tags",

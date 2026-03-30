@@ -11,7 +11,7 @@ import lombok.*;
 @Builder
 public class EmployerProfile {
     @Id
-    private Long id; // ID будет совпадать с ID юзера
+    private Long id;
 
     @OneToOne
     @MapsId
@@ -19,7 +19,7 @@ public class EmployerProfile {
     private User user;
 
     private String companyName;
-    private String inn; // Для верификации
+    private String inn;
 
     @Column(columnDefinition = "TEXT")
     private String description;

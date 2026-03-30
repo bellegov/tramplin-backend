@@ -35,7 +35,7 @@ public class NetworkingController {
         return ResponseEntity.ok(networkingService.getMyFriends());
     }
 
-    // 4. Рекомендовать друга на вакансию (Та самая фича из ТЗ!)
+    // 4. Рекомендовать друга на вакансию
     @PostMapping("/recommend")
     public ResponseEntity<String> recommend(@RequestBody RecommendationRequest request) {
         networkingService.recommendFriend(request.friendId(), request.opportunityId(), request.message());

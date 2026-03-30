@@ -75,16 +75,16 @@ public class NetworkingService {
     // 2. Принять запрос в друзья
     @Transactional
     public void acceptFriendRequest(Long seekerIdWhoSentRequest) {
-        SeekerProfile me = getCurrentSeeker(); // Я (тот, кому отправили)
+        SeekerProfile me = getCurrentSeeker();
 
-        // Ищем заявку, где seeker - это тот парень, а friend - это Я
+
         Friendship request = friendshipRepo.findBySeekerIdAndFriendId(seekerIdWhoSentRequest, me.getId())
                 .orElseThrow(() -> new RuntimeException("Запрос в друзья не найден"));
 
-        request.setAccepted(true); // Приняли!
+        request.setAccepted(true);
         friendshipRepo.save(request);
 
-        // Создаем обратную связь для удобства поиска (Я -> Тот парень = true)
+
         if (!friendshipRepo.existsBySeekerIdAndFriendId(me.getId(), seekerIdWhoSentRequest)) {
             friendshipRepo.save(Friendship.builder()
                     .seeker(me)
@@ -94,14 +94,14 @@ public class NetworkingService {
         }
     }
 
-    // 3. Получить список ВХОДЯЩИХ заявок (кто хочет дружить со мной)
+    // 3. Получить список ВХОДЯЩИХ заявок
     public List<SeekerProfileResponse> getIncomingRequests() {
         SeekerProfile me = getCurrentSeeker();
 
-        // Ищем, где friend_id = Я, а accepted = false
+
         return friendshipRepo.findAllByFriendIdAndAcceptedFalse(me.getId())
                 .stream()
-                .map(f -> mapToResponse(f.getSeeker())) // Показываем тех, кто отправил
+                .map(f -> mapToResponse(f.getSeeker()))
                 .collect(Collectors.toList());
     }
 
