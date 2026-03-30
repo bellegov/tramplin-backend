@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface RecommendationRepository extends JpaRepository<Recommendation, Long> {
     List<Recommendation> findAllByRecommendedId(Long recommendedId);
+    List<Recommendation> findAllByRecommendedIdAndOpportunityId(Long recommendedId, Long opportunityId);
 }
