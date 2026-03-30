@@ -41,4 +41,17 @@ public class NetworkingController {
         networkingService.recommendFriend(request.friendId(), request.opportunityId(), request.message());
         return ResponseEntity.ok("Рекомендация успешно отправлена");
     }
+
+    // 3. Получить входящие запросы в друзья
+    @GetMapping("/friends/requests")
+    public ResponseEntity<List<SeekerProfileResponse>> getIncomingRequests() {
+        return ResponseEntity.ok(networkingService.getIncomingRequests());
+    }
+
+    // 4. Принять запрос в друзья
+    @PostMapping("/friends/accept/{seekerId}")
+    public ResponseEntity<String> acceptFriendRequest(@PathVariable Long seekerId) {
+        networkingService.acceptFriendRequest(seekerId);
+        return ResponseEntity.ok("Заявка принята, теперь вы друзья");
+    }
 }

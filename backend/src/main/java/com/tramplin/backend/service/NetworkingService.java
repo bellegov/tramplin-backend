@@ -6,6 +6,7 @@ import com.tramplin.backend.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -70,6 +71,41 @@ public class NetworkingService {
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
+
+    // 2. Принять запрос в друзья
+    @Transactional
+    public void acceptFriendRequest(Long seekerIdWhoSentRequest) {
+        SeekerProfile me = getCurrentSeeker(); // Я (тот, кому отправили)
+
+        // Ищем заявку, где seeker - это тот парень, а friend - это Я
+        Friendship request = friendshipRepo.findBySeekerIdAndFriendId(seekerIdWhoSentRequest, me.getId())
+                .orElseThrow(() -> new RuntimeException("Запрос в друзья не найден"));
+
+        request.setAccepted(true); // Приняли!
+        friendshipRepo.save(request);
+
+        // Создаем обратную связь для удобства поиска (Я -> Тот парень = true)
+        if (!friendshipRepo.existsBySeekerIdAndFriendId(me.getId(), seekerIdWhoSentRequest)) {
+            friendshipRepo.save(Friendship.builder()
+                    .seeker(me)
+                    .friend(request.getSeeker())
+                    .accepted(true)
+                    .build());
+        }
+    }
+
+    // 3. Получить список ВХОДЯЩИХ заявок (кто хочет дружить со мной)
+    public List<SeekerProfileResponse> getIncomingRequests() {
+        SeekerProfile me = getCurrentSeeker();
+
+        // Ищем, где friend_id = Я, а accepted = false
+        return friendshipRepo.findAllByFriendIdAndAcceptedFalse(me.getId())
+                .stream()
+                .map(f -> mapToResponse(f.getSeeker())) // Показываем тех, кто отправил
+                .collect(Collectors.toList());
+    }
+
+
 
     private SeekerProfileResponse mapToResponse(SeekerProfile p) {
         return new SeekerProfileResponse(
