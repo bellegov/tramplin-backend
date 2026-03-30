@@ -135,6 +135,8 @@ public class SeekerService {
         return new ApplicationResponse(
                 app.getId(),
                 app.getOpportunity().getId(),
+                app.getOpportunity().getEmployer().getId(),
+                app.getSeeker().getId(),
                 app.getOpportunity().getTitle(),
                 app.getOpportunity().getEmployer().getCompanyName(),
                 app.getSeeker().getUser().getDisplayName(),
